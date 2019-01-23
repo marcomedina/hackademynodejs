@@ -33,7 +33,8 @@ apiRoutes.post('/authenticate', function (req, res) {
         // if user is found and password is right
         // create a token
         var payload = {
-          email: user.email
+          email: user.email,
+          admin: user.admin
         }
         var token = jwt.sign(payload, config.secret, {
           expiresIn: 86400 // expires in 24 hours
@@ -130,6 +131,25 @@ apiRoutes.post('/todos', function (req, res) {
 
 apiRoutes.get('/check', function (req, res) {
   res.json(req.user);
+});
+
+// Admin Routes
+apiRoutes.use(function(req, res, next) {
+  if(!req.user.admin) {
+    return res.json({
+      success: false,
+      message: 'Admin access needed'
+    })
+  }
+
+  next();
+});
+
+apiRoutes.get('/adminOnly', function(req, res) {
+  return res.json({
+    success: true,
+    message: 'You Are and Admin'
+  })
 });
 
 
